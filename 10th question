@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+struct my_msgbuf {
+    long mtype;
+    char mtext[200];
+};
+
+int main() {
+    int msqid;
+    key_t key;
+    struct my_msgbuf buf;
+
+    key = ftok("myfile.txt", 'B');
+
+    msqid = msgget(key, 0666 | IPC_CREAT);
+
+    if (msqid == -1) {
+        perror("msgget");
+        exit(1);
+    }
+
+    printf("Sender: Message Queue created.\n");
+
+    while (1) {
+        printf("Sender: Enter a message: ");
+        fgets(buf.mtext, sizeof(buf.mtext), stdin);
+
+        buf.mtype = 1;
+
+        if (strncmp(buf.mtext, "end", 3) == 0) {
+            break;
+        }
+
+        if (msgsnd(msqid, &buf, sizeof(buf.mtext), 0) == -1) {
+            perror("msgsnd");
+            exit(1);
+        }
+
+        printf("Sender: Message sent.\n");
+    }
+
+    printf("Sender: Exiting...\n");
+
+    return 0;
+}
