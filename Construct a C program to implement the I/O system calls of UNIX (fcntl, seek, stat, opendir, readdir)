@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <string.h>
+
+int main() {
+    int fd;
+    struct stat file_stat;
+    struct dirent *dir_entry;
+    DIR *dir;
+
+    // Open a file
+    fd = open("testfile.txt", O_RDWR | O_CREAT, 0644);
+    if (fd == -1) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    // Get file status
+    if (fstat(fd, &file_stat) == -1) {
+        perror("Error getting file status");
+        close(fd);
+        return 1;
+    }
+
+    printf("File size: %ld bytes\n", (long)file_stat.st_size);
+
+    // Set file pointer to the end of the file
+    if (lseek(fd, 0, SEEK_END) == -1) {
+        perror("Error setting file pointer");
+        close(fd);
+        return 1;
+    }
+
+    // Write to the file
+    write(fd, "Hello, World!", 13);
+
+    // Open a directory
+    dir = opendir(".");
+    if (dir == NULL) {
+        perror("Error opening directory");
+        close(fd);
+        return 1;
+    }
+
+    // Read directory entries
+    while ((dir_entry = readdir(dir)) != NULL) {
+        printf("Directory entry: %s\n", dir_entry->d_name);
+    }
+
+    // Close the directory
+    closedir(dir);
+
+    // Close the file
+    close(fd);
+
+    return 0;
+}
