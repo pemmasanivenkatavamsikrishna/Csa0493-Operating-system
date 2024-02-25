@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <pthread.h>
+
+void *thread_func(void *arg) {
+    int tid = *((int *) arg);
+    printf("Thread %d is running.\n", tid);
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t thread_id[2];
+    int thread_args[2] = {1, 2};
+
+    // create two threads
+    pthread_create(&thread_id[0], NULL, thread_func, (void *) &thread_args[0]);
+    pthread_create(&thread_id[1], NULL, thread_func, (void *) &thread_args[1]);
+
+    // wait for both threads to finish
+    pthread_join(thread_id[0], NULL);
+    pthread_join(thread_id[1], NULL);
+
+    // check if the two threads are equal
+    if (pthread_equal(thread_id[0], thread_id[1])) {
+        printf("The two threads are equal.\n");
+    } else {
+        printf("The two threads are not equal.\n");
+    }
+
+    return 0;
+}
