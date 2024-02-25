@@ -1,0 +1,37 @@
+#include <stdio.h>
+
+#define NUM_FRAMES 3
+#define NUM_PAGES 5
+
+int frames[NUM_FRAMES];
+int counter = 0;
+
+void referencePage(int page) {
+    int i;
+    for (i = 0; i < NUM_FRAMES; i++) {
+        if (frames[i] == page) {
+            printf("Page %d is already in memory at frame %d.\n", page, i);
+            return;
+        }
+    }
+
+    if (counter < NUM_FRAMES) {
+        frames[counter] = page;
+        counter++;
+        printf("Page %d is loaded into frame %d.\n", page, counter - 1);
+    } else {
+        frames[counter % NUM_FRAMES] = page;
+        printf("Page %d replaces page %d in frame %d.\n", page, frames[counter % NUM_FRAMES], (counter % NUM_FRAMES));
+    }
+}
+
+int main() {
+    int i;
+    int references[NUM_PAGES] = {4, 2, 1, 5, 2, 4, 5, 3, 2, 1, 2, 5, 4, 3, 2, 1, 5, 4, 3, 2};
+
+    for (i = 0; i < NUM_PAGES; i++) {
+        referencePage(references[i]);
+    }
+
+    return 0;
+}
