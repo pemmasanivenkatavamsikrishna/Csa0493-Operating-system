@@ -1,0 +1,46 @@
+#include <stdio.h>
+
+#define NUM_RECORDS 10
+#define RECORD_SIZE 100
+
+int file[NUM_RECORDS][RECORD_SIZE];
+
+void readRecord(int record) {
+    int i;
+    if (record < 0 || record >= NUM_RECORDS) {
+        printf("Invalid record number.\n");
+        return;
+    }
+
+    // Read all the previous records
+    for (i = 0; i < record; i++) {
+        printf("Record %d: ", i);
+        fwrite(file[i], RECORD_SIZE, 1, stdout);
+        printf("\n");
+    }
+
+    // Read the requested record
+    printf("Record %d: ", record);
+    fwrite(file[record], RECORD_SIZE, 1, stdout);
+    printf("\n");
+}
+
+int main() {
+    int i;
+    int records[NUM_RECORDS] = {1, 3, 5, 7, 2, 4, 6, 8, 9, 0};
+
+    // Initialize the file with random data
+    for (i = 0; i < NUM_RECORDS; i++) {
+        int j;
+        for (j = 0; j < RECORD_SIZE; j++) {
+            file[i][j] = 'a' + (i * RECORD_SIZE + j) % 26;
+        }
+    }
+
+    // Read the records in the order specified
+    for (i = 0; i < NUM_RECORDS; i++) {
+        readRecord(records[i]);
+    }
+
+    return 0;
+}
