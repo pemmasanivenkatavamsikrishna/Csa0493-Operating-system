@@ -1,0 +1,77 @@
+#include <stdio.h>
+
+#define NUM_FRAMES 3
+#define NUM_PAGES 5
+
+int frames[NUM_FRAMES];
+int counter[NUM_PAGES] = {0};
+int time = 0;
+int next[NUM_PAGES] = {0};
+
+void referencePage(int page) {
+    int i, min_time = time + 1;
+    int min_index = -1;
+    int found = 0;
+
+    for (i = 0; i < NUM_FRAMES; i++) {
+        if (frames[i] == page) {
+            // Page is already in memory, update its counter
+            counter[page] = ++time;
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        // Page is not in memory, find an empty frame
+        for (i = 0; i < NUM_FRAMES; i++) {
+            if (frames[i] == -1) {
+                frames[i] = page;
+                counter[page] = ++time;
+                found = 1;
+                break;
+            }
+        }
+
+        // If no empty frame was found, replace the page that will not be used for the longest time
+        if (!found) {
+            for (i = 0; i < NUM_PAGES; i++) {
+                if (counter[i] < min_time && next[i] != time + 1) {
+                    min_time = counter[i];
+                    min_index = i;
+                }
+            }
+
+            frames[min_index] = page;
+            counter[page] = ++time;
+        }
+    }
+
+    // Update the next reference time for all pages
+    for (i = 0; i < NUM_PAGES; i++) {
+        if (next[i] == time + 1) {
+            next[i] = 0;
+        }
+        next[i]++;
+    }
+
+    // Print the reference information
+    printf("Page %d is referenced at time %d. ", page, time);
+    for (i = 0; i < NUM_FRAMES; i++) {
+        if (frames[i] != -1) {
+            printf("Frame %d: Page %d, Counter %d. ", i, frames[i], counter[frames[i]]);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    int i;
+    int references[NUM_PAGES] = {4, 2, 1, 5, 2, 4, 5, 3, 2, 1, 2, 5, 4, 3, 2, 1, 5, 4, 3, 2};
+
+    for (i = 0; i < NUM_PAGES; i++) {
+        referencePage(references[i]);
+    }
+
+    return 0;
+}
