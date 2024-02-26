@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct block {
+    char data[1024];
+    struct block *next;
+} Block;
+
+typedef struct file {
+    Block *first;
+    Block *last;
+    int size;
+} File;
+
+File *new_file() {
+    File *file = malloc(sizeof(File));
+    file->first = NULL;
+    file->last = NULL;
+    file->size = 0;
+    return file;
+}
+
+void append_block(File *file, char *data) {
+    Block *block = malloc(sizeof(Block));
+    if (file->first == NULL) {
+        file->first = block;
+    } else {
+        file->last->next = block;
+    }
+    file->last = block;
+    strcpy(block->data, data);
+    file->size += strlen(data);
+    block->next = NULL;
+}
+
+char *read_data(File *file, int offset) {
+    Block *block = file->first;
+    int cur_offset = 0;
+    while (block != NULL && cur_offset < offset) {
+        cur_offset += strlen(block->data);
+        block = block->next;
+    }
+    if (block == NULL) {
+        return "";
+    }
+    char *data = malloc(file->size - offset);
+    int cur_pos = 0;
+    while (block != NULL && cur_offset < file->size) {
+        int len = strlen(block->data);
+        if (cur_offset + len > offset) {
+            strncpy(data + cur_pos, block->data + (cur_offset - offset), offset + len - cur_offset);
+            cur_pos += offset + len - cur_offset;
+        }
+        cur_offset += len;
+        block = block->next;
+    }
+    return data;
+}
+
+void free_file(File *file) {
+    Block *block = file->first;
+    while (block != NULL) {
+        Block *next = block->next;
+        free(block);
+        block = next;
+    }
+    free(file);
+}
+
+int main() {
+    File *file = new_file();
+    append_block(file, "Hello, world!");
+    printf("%s\n", read_data(file, 0));
+    free_file(file);
+    return 0;
+}
