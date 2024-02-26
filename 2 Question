@@ -13,6 +13,7 @@ int main()
 	{ 
 		printf("Cannot open file %s \n", filename); 
 		exit(0); 
+
 	} 
 
 	printf("Enter the filename to open for writing \n"); 
