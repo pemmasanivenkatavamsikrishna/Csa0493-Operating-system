@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct request {
+    int cylinder;
+    struct request *next;
+} Request;
+
+Request *new_request(int cylinder) {
+    Request *req = malloc(sizeof(Request));
+    req->cylinder = cylinder;
+    req->next = NULL;
+    return req;
+}
+
+void add_request(Request **head, Request *req) {
+    if (*head == NULL) {
+        *head = req;
+    } else {
+        Request *cur = *head;
+        while (cur->next != NULL) {
+            cur = cur->next;
+        }
+        cur->next = req;
+    }
+}
+
+void print_requests(Request *head) {
+    Request *cur = head;
+    printf("Request queue: ");
+    while (cur != NULL) {
+        printf("%d ", cur->cylinder);
+        cur = cur->next;
+    }
+    printf("\n");
+}
+
+void fcfs(Request *head, int current) {
+    Request *cur = head;
+    printf("FCFS disk scheduling algorithm:\n");
+    printf("Current cylinder: %d\n", current);
+    print_requests(head);
+    int total_movement = 0;
+    while (cur != NULL) {
+        int movement = abs(cur->cylinder - current);
+        total_movement += movement;
+        printf("Move head to cylinder %d, movement: %d\n", cur->cylinder, movement);
+        current = cur->cylinder;
+        cur = cur->next;
+    }
+    printf("Total head movement: %d\n", total_movement);
+}
+
+int main() {
+    Request *req1 = new_request(100);
+    Request *req2 = new_request(200);
+    Request *req3 = new_request(50);
+    Request *req4 = new_request(300);
+    Request *head = NULL;
+    add_request(&head, req1);
+    add_request(&head, req2);
+    add_request(&head, req3);
+    add_request(&head, req4);
+    int current = 50;
+    fcfs(head, current);
+    return 0;
+}
