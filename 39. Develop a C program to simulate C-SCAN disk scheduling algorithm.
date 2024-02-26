@@ -1,0 +1,68 @@
+#include <stdio.h>
+
+// Function to calculate absolute value
+int absoluteValue(int num) {
+    if (num < 0) {
+        return -num;
+    }
+    return num;
+}
+
+// Function to simulate C-SCAN disk scheduling algorithm
+void cScanDiskScheduling(int queue[], int n, int headPosition, int maxRange) {
+    int seekCount = 0;
+    int direction = 1; // 1 for moving towards right, -1 for moving towards left
+    int currentPosition = headPosition;
+    int i;
+
+    // Sort the queue in ascending order
+    for (i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (queue[j] > queue[j + 1]) {
+                int temp = queue[j];
+                queue[j] = queue[j + 1];
+                queue[j + 1] = temp;
+            }
+        }
+    }
+
+    // Handle the left side of the disk
+    for (i = 0; i < n; i++) {
+        if (queue[i] < currentPosition) {
+            seekCount += absoluteValue(queue[i] - currentPosition);
+            currentPosition = queue[i];
+        }
+    }
+
+    // Move to the other end of the disk
+    seekCount += maxRange - currentPosition;
+    currentPosition = maxRange;
+
+    // Handle the right side of the disk
+    for (i = 0; i < n; i++) {
+        if (queue[i] > currentPosition) {
+            seekCount += queue[i];
+            currentPosition = queue[i];
+        }
+    }
+
+    // Print the seek sequence
+    printf("Initial position of Head: %d\n", headPosition);
+    printf("Total Number of Seek Operations = %d\n", seekCount);
+    printf("Seek Sequence: ");
+    for (i = 0; i < n; i++) {
+        printf("%d ", queue[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int queue[] = {60, 79, 92, 114, 176, 199, 0, 11, 34, 41};
+    int n = sizeof(queue) / sizeof(queue[0]);
+    int maxRange = 200;
+    int headPosition = 50;
+
+    cScanDiskScheduling(queue, n, headPosition, maxRange);
+
+    return 0;
+}
